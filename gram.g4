@@ -2,32 +2,36 @@ grammar gram;
 
 prog:   stat+ ;
 
-stat:   adv NEWLINE                                 
-    |   ID "=" arg NEWLINE
-    |   em NEWLINE
+stat:   adv NEWLINE                                 # none                          
+    |   ID '=' arg NEWLINE                          # Asignacion
+    |   em NEWLINE                                  # none
+    |   NEWLINE                                     # none            
     ;
 
-adv:    arg
-    |   IF "(" argv "):" stat ELSE ":" stat         # If
-    |   FOR ID "in" ID ":" adv                      # For
-    |   WHILE "(" argv "):" adv                     # While
-    |   DEF ID "( ID* ):" adv                       # Def
+adv:    arg                                         # CallAdvToArg
+    |   IF '(' argv '):' stat ELSE ':' stat         # If
+    |   FOR ID 'in' ID ':' arg                   # For
+    |   WHILE '(' argv '):' arg                     # While
+    |   DEF ID '(' ID* '):' adv                       # Def
     ;
 
-argv:   arg "==" arg
-    |   arg ">" arg
-    |   arg "<" arg
-    |   arg "!=" arg
-    |   arg "<=" arg
-    |   arg ">=" arg
+argv:   arg '==' arg
+    |   arg '>' arg
+    |   arg '<' arg
+    |   arg '!=' arg
+    |   arg '<=' arg
+    |   arg '>=' arg
     |   ID
     ;
 
-arg:    "(" arg ")"
+arg:    '(' arg ')'
     |   conc
     |   opr
     |   em
-    |   '[' em+ ']'
+    |   '[' arreglo+ ']'
+    ;
+
+arreglo: em+ ','*
     ;
 
 conc:   opr MUL opr                                 # Mul
@@ -50,27 +54,27 @@ opr:  'mod(' arg ')'                                # Mod
     |  'euler(' arg ')'                             # Euler
     |  'rad(' arg ')'                               # Rad
     |  'deg(' arg ')'                               # Deg
-    |   em
+    |   em                                          # CallOprToEm
     ; 
 
 em: PI                                              # Pi
-    |   ID
-    |   INT
-    |   BOOL
+    |   ID                                          # Id
+    |   INT                                         # Int
+    |   BOOL                                        # Bool
     ;   
 
-MUL :   '*' ;
-DIV :   '/' ;
-ADD :   '+' ;
-SUB :   '-' ;
-PI :   'PI' ;
+MUL : '*' ;
+DIV : '/' ;
+ADD : '+' ;
+SUB : '-' ;
+PI : 'PI' ;
 FOR : 'for' ;
 IF : 'if' ;
 ELSE : 'else' ;
 WHILE : 'while' ;
 DEF : 'def' ;
 BOOL : 'True' | 'False' ;
-ID  :   [a-zA-Z]+ ;      // match identifiers
-INT :   [0-9]+ ;         // match integers
-NEWLINE :'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
-WS  :   [ \t]+ -> skip ; // toss out whitespace
+ID : [a-zA-Z]+ ;      // match identifiers
+INT : [0-9]+ ;         // match integers
+NEWLINE : '\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+WS :  [ \t]+ -> skip ; // toss out whitespace
