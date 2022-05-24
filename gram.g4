@@ -2,79 +2,42 @@ grammar gram;
 
 prog:   stat+ ;
 
-stat:   adv NEWLINE                                 # none                          
-    |   ID '=' arg NEWLINE                          # Asignacion
-    |   em NEWLINE                                  # none
-    |   NEWLINE                                     # none            
+stat:   expr NEWLINE                # printExpr
+    |   ID '=' expr NEWLINE         # assign
+    |   NEWLINE                     # blank
     ;
 
-adv:    arg                                         # CallAdvToArg
-    |   IF '(' argv '):' stat ELSE ':' stat         # If
-    |   FOR ID 'in' ID ':' arg                   # For
-    |   WHILE '(' argv '):' arg                     # While
-    |   DEF ID '(' ID* '):' adv                       # Def
+expr:   expr op=('*'|'/') expr      # MulDiv
+    |   expr op=('+'|'-') expr      # AddSub
+    |   expr '%' expr               # Mod
+    |   'sqrt(' expr ',' expr ')'   # Sqrt
+    |   expr '**' expr              # Pow
+    |   'sin(' expr ')'             # Sin
+    |   'cos(' expr ')'             # Cos
+    |   'tan(' expr ')'             # Tan
+    |   'arcsin(' expr ')'          # Arcsin
+    |   'arccos(' expr ')'          # Arccos
+    |   'arctan(' expr ')'          # Arctan
+    |   'log(' expr ',' expr ')'    # Log
+    |   'factorial(' expr ')'       # Factorial
+    |   'euler(' expr ')'           # Euler
+    |   'rad(' expr ')'             # Rad
+    |   'deg(' expr ')'             # Deg
+    |   'pi'                        # Pi
+    |   NUM                         # num
+    |   ID                          # id
+    |   '[' arreglo+ ']'            # array
+    |   '(' expr ')'                # parens
     ;
 
-argv:   arg '==' arg
-    |   arg '>' arg
-    |   arg '<' arg
-    |   arg '!=' arg
-    |   arg '<=' arg
-    |   arg '>=' arg
-    |   ID
+arreglo: NUM+ ','*
     ;
 
-arg:    '(' arg ')'
-    |   conc
-    |   opr
-    |   em
-    |   '[' arreglo+ ']'
-    ;
-
-arreglo: em+ ','*
-    ;
-
-conc:   opr MUL opr                                 # Mul
-    |   opr DIV opr                                 # Div
-    |   opr ADD opr                                 # Add
-    |   opr SUB opr                                 # Sub
-    ;
-
-opr:  'mod(' arg ')'                                # Mod
-    |  'sqrt(' arg ',' arg ')'                      # Sqrt
-    |  'pow(' arg ',' arg ')'                       # Pow
-    |  'sin(' arg ')'                               # Sin
-    |  'cos(' arg ')'                               # Cos
-    |  'tan(' arg ')'                               # Tan
-    |  'arcsin(' arg ')'                            # Arcsin
-    |  'arccos(' arg ')'                            # Arccos
-    |  'arctan(' arg ')'                            # Arctan
-    |  'log(' arg ',' arg ')'                       # Log
-    |  'factorial(' arg ')'                         # Factorial
-    |  'euler(' arg ')'                             # Euler
-    |  'rad(' arg ')'                               # Rad
-    |  'deg(' arg ')'                               # Deg
-    |   em                                          # CallOprToEm
-    ; 
-
-em: PI                                              # Pi
-    |   ID                                          # Id
-    |   INT                                         # Int
-    |   BOOL                                        # Bool
-    ;   
-
-MUL : '*' ;
-DIV : '/' ;
-ADD : '+' ;
-SUB : '-' ;
-PI : 'PI' ;
-FOR : 'for' ;
-IF : 'if' ;
-ELSE : 'else' ;
-WHILE : 'while' ;
-DEF : 'def' ;
-BOOL : 'True' | 'False' ;
-ID : [a-zA-Z]+ ;      // match identifiers
-INT : [0-9]+ ;         // match integers
-NEWLINE : '\r'? '\n' ;     // return newlines to parser (is end-statement signal)
-WS :  [ \t]+ -> skip ; // toss out whitespace
+MUL :   '*' ;
+DIV :   '/' ;
+ADD :   '+' ;
+SUB :   '-' ;
+ID  :   [a-zA-Z]+ ;      // match identifiers
+NUM :   [0-9]+'.'?[0-9]* ;         // match integers
+NEWLINE:    '\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+WS  :   [ \t]+ -> skip ; // toss out whitespace
